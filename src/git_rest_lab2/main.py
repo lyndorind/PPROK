@@ -1,8 +1,10 @@
 from fastapi import FastAPI
 
+from git_rest_lab2 import __version__
+
 app = FastAPI(
     title="Git REST Lab 2",
-    version="1.0.0",
+    version=__version__,
 )
 
 
@@ -20,12 +22,15 @@ def health_check() -> dict[str, str]:
 def hello_user(name: str) -> dict[str, str]:
     return {"message": f"Hello, {name}!"}
 
+
 @app.get("/about")
 def about_service() -> dict[str, str]:
     return {
         "service": "Git REST Lab 2",
         "framework": "FastAPI",
     }
+
+
 @app.get("/version")
 def service_version() -> dict[str, str]:
-    return {"version": "1.0.0"}
+    return {"version": __version__}
