@@ -1,0 +1,58 @@
+name: Create Tag and Release
+description: Creates a Git tag and GitHub Release with build artifacts
+
+inputs:
+  version:
+    description: Release version without the v prefix
+    required: true
+
+  notes-file:
+    description: Path to the file containing release notes
+    required: true
+
+  assets:
+    description: Files to attach to the GitHub Release
+    required: false
+    default: "dist/*"
+
+runs:
+  using: composite
+
+  steps:
+    - name: Configure Git
+      shell: bash
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+    - name: Create Git tag
+      shell: bash
+      env:
+        VERSION: ${{ inputs.version }}
+      run: |
+        TAG="v${VERSION}"
+
+        git fetch --tags
+
+        if git rev-parse "$TAG" >/dev/null 2>&1; then
+          echo "Tag $TAG already exists."
+          exit 1
+        fi
+
+        git tag -a "$TAG" -m "Release $TAG"
+        git push origin "$TAG"
+
+    - name: Create GitHub Release
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        VERSION: ${{ inputs.version }}
+        NOTES_FILE: ${{ inputs.notes-file }}
+        ASSETS: ${{ inputs.assets }}
+      run: |
+        TAG="v${VERSION}"
+
+        gh release create "$TAG" \
+          $ASSETS \
+          --title "$TAG" \
+          --notes-file "$NOTES_FILE"
