@@ -39,3 +39,9 @@ def test_version():
     response = client.get("/version")
     assert response.status_code == 200
     assert response.json() == {"version": __version__}
+
+
+def test_hello_unicode():
+    response = client.get("/hello/Марія")
+    assert response.status_code == 200
+    assert response.json() == {"message": "Hello, Марія!"}
