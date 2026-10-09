@@ -1,3 +1,4 @@
+
 name: PR Package Build
 
 on:
@@ -26,14 +27,21 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install build tools
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Install development dependencies
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install build ruff
+          uv sync --frozen
 
       - name: Ruff static analysis
         run: |
-          ruff check src --no-fix
+          uv run --frozen ruff check src --no-fix
+
+      - name: Install build tools
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install build
 
       - name: Build Python package
         run: |
