@@ -67,7 +67,7 @@ jobs:
         run: uv sync --frozen --no-build
 
       - name: Export dependencies
-        run: uv export --frozen --no-dev --no-hashes -o requirements-snyk.txt
+        run: uv export --frozen --no-dev --no-hashes --no-emit-project -o requirements-snyk.txt
 
       - name: Setup Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
