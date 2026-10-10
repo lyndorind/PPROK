@@ -66,6 +66,9 @@ jobs:
       - name: Install dependencies
         run: uv sync --frozen --no-build
 
+      - name: Install pip for Snyk
+        run: uv pip install --python "$(uv run --no-sync --no-build python -c 'import sys; print(sys.executable)')" pip
+
       - name: Export dependencies
         run: uv export --frozen --no-dev --no-hashes --no-emit-project -o requirements-snyk.txt
 
