@@ -34,7 +34,7 @@ jobs:
         run: uv sync --frozen --no-build
 
       - name: Run tests with coverage
-        run: uv run --no-sync pytest -v
+        run: uv run --no-sync --no-build pytest -v
 
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@d209202bc7d53ff1cc128f7f907dac145c9d6ae9 # v8

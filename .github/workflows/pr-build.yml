@@ -36,7 +36,7 @@ jobs:
 
       - name: Ruff static analysis
         run: |
-          uv run --no-sync ruff check src --no-fix
+          uv run --no-sync --no-build ruff check src --no-fix
 
       - name: Build Python package
         run: |

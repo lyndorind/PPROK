@@ -35,7 +35,7 @@ jobs:
         run: uv sync --frozen --no-build
 
       - name: Run tests with Allure
-        run: uv run --no-sync pytest -v
+        run: uv run --no-sync --no-build pytest -v
 
       - name: Setup Java
         uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
