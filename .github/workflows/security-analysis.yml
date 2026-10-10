@@ -1,0 +1,124 @@
+name: Security Analysis
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sonarqube:
+    name: SonarQube Cloud
+    if: vars.SECURITY_SCANS_ENABLED == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+
+      - name: Install dependencies
+        run: uv sync --frozen --no-build
+
+      - name: Run tests with coverage
+        run: uv run --no-sync --no-build pytest -v
+
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@d209202bc7d53ff1cc128f7f907dac145c9d6ae9 # v8
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.host.url=https://sonarcloud.io
+            -Dsonar.organization=${{ vars.SONAR_ORGANIZATION }}
+            -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }}
+
+  snyk-oss:
+    name: Snyk Open Source
+    if: vars.SNYK_SCANS_ENABLED == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Setup Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+
+      - name: Install dependencies
+        run: uv sync --frozen --no-build
+
+      - name: Install pip for Snyk
+        run: uv pip install --python "$(uv run --no-sync --no-build python -c 'import sys; print(sys.executable)')" pip
+
+      - name: Export dependencies
+        run: uv export --frozen --no-dev --no-hashes --no-emit-project -o requirements-snyk.txt
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "22"
+
+      - name: Install Snyk CLI
+        run: |
+          curl --fail --location --retry 3 --proto '=https' --proto-redir '=https' \
+            https://github.com/snyk/cli/releases/download/v1.1307.4/snyk-linux \
+            --output snyk-linux
+          echo "b0baee4fa4d7d11b7df927a1046cf8137a8a89fafac8101a45c3c0e0777ddc35  snyk-linux" | sha256sum --check
+          chmod +x snyk-linux
+          sudo mv snyk-linux /usr/local/bin/snyk
+          snyk --version
+
+      - name: Snyk Open Source Scan
+        run: |
+          PYTHON_PATH=$(uv run --no-sync --no-build python -c "import sys; print(sys.executable)")
+          snyk test --file=requirements-snyk.txt --package-manager=pip --command="$PYTHON_PATH" --org=xetayac
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+  snyk-code:
+    name: Snyk Code
+    if: vars.SNYK_SCANS_ENABLED == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "22"
+
+      - name: Install Snyk CLI
+        run: |
+          curl --fail --location --retry 3 --proto '=https' --proto-redir '=https' \
+            https://github.com/snyk/cli/releases/download/v1.1307.4/snyk-linux \
+            --output snyk-linux
+          echo "b0baee4fa4d7d11b7df927a1046cf8137a8a89fafac8101a45c3c0e0777ddc35  snyk-linux" | sha256sum --check
+          chmod +x snyk-linux
+          sudo mv snyk-linux /usr/local/bin/snyk
+          snyk --version
+
+      - name: Snyk Code Scan
+        run: snyk code test
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}

@@ -32,3 +32,13 @@ Thumbs.db
 dist/
 build/
 *.egg-info/
+
+# VS Code local settings
+.vscode/
+
+# Allure test results
+allure-results/
+allure-report/
+
+# Generated Snyk dependencies
+requirements-snyk.txt
