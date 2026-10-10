@@ -86,9 +86,8 @@ jobs:
 
       - name: Snyk Open Source Scan
         run: |
-          uv run --no-sync --no-build python -m pip --version || true
-          uv run --no-sync --no-build python -m pip list || true
-          snyk test --file=requirements-snyk.txt --package-manager=pip --command=.venv/bin/python -d
+          PYTHON_PATH=$(uv run --no-sync --no-build python -c "import sys; print(sys.executable)")
+          snyk test --file=requirements-snyk.txt --package-manager=pip --command="$PYTHON_PATH" --org=xetayac
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
