@@ -85,7 +85,10 @@ jobs:
           snyk --version
 
       - name: Snyk Open Source Scan
-        run: snyk test --file=requirements-snyk.txt --package-manager=pip
+        run: |
+          uv run --no-sync --no-build python -m pip --version || true
+          uv run --no-sync --no-build python -m pip list || true
+          snyk test --file=requirements-snyk.txt --package-manager=pip --command=.venv/bin/python -d
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
