@@ -48,7 +48,7 @@ jobs:
 
   snyk-oss:
     name: Snyk Open Source
-    if: vars.SECURITY_SCANS_ENABLED == 'true'
+    if: vars.SNYK_SCANS_ENABLED == 'true'
     runs-on: ubuntu-latest
 
     steps:
@@ -91,7 +91,7 @@ jobs:
 
   snyk-code:
     name: Snyk Code
-    if: vars.SECURITY_SCANS_ENABLED == 'true'
+    if: vars.SNYK_SCANS_ENABLED == 'true'
     runs-on: ubuntu-latest
 
     steps:
