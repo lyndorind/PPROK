@@ -18,26 +18,26 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
 
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: "3.12"
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
 
       - name: Install dependencies
-        run: uv sync --frozen
+        run: uv sync --frozen --no-build
 
       - name: Run tests with coverage
         run: uv run --frozen pytest -v
 
       - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v8
+        uses: SonarSource/sonarqube-scan-action@d209202bc7d53ff1cc128f7f907dac145c9d6ae9 # v8
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
@@ -53,29 +53,36 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: "3.12"
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
 
       - name: Install dependencies
-        run: uv sync --frozen
+        run: uv sync --frozen --no-build
 
       - name: Export dependencies
         run: uv export --frozen --no-dev --no-hashes -o requirements-snyk.txt
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: "22"
 
       - name: Install Snyk CLI
-        run: npm install --global snyk
+        run: |
+          curl --fail --location --retry 3 \
+            https://github.com/snyk/cli/releases/download/v1.1307.4/snyk-linux \
+            --output snyk-linux
+          echo "b0baee4fa4d7d11b7df927a1046cf8137a8a89fafac8101a45c3c0e0777ddc35  snyk-linux" | sha256sum --check
+          chmod +x snyk-linux
+          sudo mv snyk-linux /usr/local/bin/snyk
+          snyk --version
 
       - name: Snyk Open Source Scan
         run: snyk test --file=requirements-snyk.txt --package-manager=pip
@@ -89,15 +96,22 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: "22"
 
       - name: Install Snyk CLI
-        run: npm install --global snyk
+        run: |
+          curl --fail --location --retry 3 \
+            https://github.com/snyk/cli/releases/download/v1.1307.4/snyk-linux \
+            --output snyk-linux
+          echo "b0baee4fa4d7d11b7df927a1046cf8137a8a89fafac8101a45c3c0e0777ddc35  snyk-linux" | sha256sum --check
+          chmod +x snyk-linux
+          sudo mv snyk-linux /usr/local/bin/snyk
+          snyk --version
 
       - name: Snyk Code Scan
         run: snyk code test
