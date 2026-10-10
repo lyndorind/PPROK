@@ -39,3 +39,6 @@ build/
 # Allure test results
 allure-results/
 allure-report/
+
+# Generated Snyk dependencies
+requirements-snyk.txt
