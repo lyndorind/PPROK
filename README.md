@@ -33,3 +33,18 @@ Interactive Swagger documentation is available at [http://localhost:8000/docs](h
 - `GET /` returns a message confirming that the service is running.
 - `GET /health` returns the service health status.
 Commit changes new
+
+## Quality and Security Checks
+
+This project uses GitHub Actions to automate code quality and security checks.
+
+- **Ruff** — Python linting.
+- **Pytest** — automated unit tests.
+- **Codecov** — test coverage reporting.
+- **Allure Report** — published test reports.
+- **SonarQube Cloud** — static code analysis.
+- **Snyk Open Source** — dependency vulnerability scanning.
+- **Snyk Code** — source code security scanning.
+- **Dependabot** — dependency monitoring and updates.
+
+Pull requests are checked automatically before merging into `main`.
