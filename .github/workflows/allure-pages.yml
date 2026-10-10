@@ -35,7 +35,7 @@ jobs:
         run: uv sync --frozen --no-build
 
       - name: Run tests with Allure
-        run: uv run --frozen pytest -v
+        run: uv run --no-sync pytest -v
 
       - name: Setup Java
         uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
@@ -50,7 +50,7 @@ jobs:
 
       - name: Generate Allure HTML Report
         run: |
-          curl --fail --location --retry 3 --output /tmp/allure.tgz https://github.com/allure-framework/allure2/releases/download/2.46.1/allure-2.46.1.tgz
+          curl --fail --location --retry 3 --proto '=https' --proto-redir '=https' --output /tmp/allure.tgz https://github.com/allure-framework/allure2/releases/download/2.46.1/allure-2.46.1.tgz
           mkdir -p /tmp/allure-cli
           tar -xzf /tmp/allure.tgz -C /tmp/allure-cli
           /tmp/allure-cli/allure-2.46.1/bin/allure generate allure-results --clean -o allure-report

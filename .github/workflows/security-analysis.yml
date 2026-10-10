@@ -34,7 +34,7 @@ jobs:
         run: uv sync --frozen --no-build
 
       - name: Run tests with coverage
-        run: uv run --frozen pytest -v
+        run: uv run --no-sync pytest -v
 
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@d209202bc7d53ff1cc128f7f907dac145c9d6ae9 # v8
@@ -76,7 +76,7 @@ jobs:
 
       - name: Install Snyk CLI
         run: |
-          curl --fail --location --retry 3 \
+          curl --fail --location --retry 3 --proto '=https' --proto-redir '=https' \
             https://github.com/snyk/cli/releases/download/v1.1307.4/snyk-linux \
             --output snyk-linux
           echo "b0baee4fa4d7d11b7df927a1046cf8137a8a89fafac8101a45c3c0e0777ddc35  snyk-linux" | sha256sum --check
@@ -105,7 +105,7 @@ jobs:
 
       - name: Install Snyk CLI
         run: |
-          curl --fail --location --retry 3 \
+          curl --fail --location --retry 3 --proto '=https' --proto-redir '=https' \
             https://github.com/snyk/cli/releases/download/v1.1307.4/snyk-linux \
             --output snyk-linux
           echo "b0baee4fa4d7d11b7df927a1046cf8137a8a89fafac8101a45c3c0e0777ddc35  snyk-linux" | sha256sum --check

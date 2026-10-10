@@ -34,7 +34,7 @@ jobs:
         run: uv sync --frozen --no-build
 
       - name: Run Unit Tests
-        run: uv run --frozen pytest -v
+        run: uv run --no-sync pytest -v
 
       - name: Upload Coverage to Codecov
         uses: codecov/codecov-action@0fb7174895f61a3b6b78fc075e0cd60383518dac # v5
